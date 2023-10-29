@@ -173,6 +173,9 @@ function buy_best_building()
    // if there's a non-cookie upgrade that's cheaper than the best building we buy that
    // if there's not, then it's either the building or the cookie based on value 
 
+   if(debug_level > 0) {
+      console.log('non-cookie check', non_cookie_upgrade_price, building_price, cookie_upgrade_price);
+   }
    if(non_cookie_upgrade_price > 0 && (non_cookie_upgrade_price < building_price || non_cookie_upgrade_price < cookie_upgrade_price )) {
       if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
          console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
