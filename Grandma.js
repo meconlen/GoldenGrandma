@@ -1,3 +1,7 @@
+var clicker = 0;
+var buyer = 0;
+var debug_level = 0;
+
 function click_golden() {
    Game.shimmers.forEach(
       function(shimmer)
@@ -211,10 +215,6 @@ function buy_best_building()
       buy_best_building.last_next_purchase = building;
    }
 }
-
-var clicker = 0;
-var buyer = 0;
-var debug_level = 0;
 
 function click()
 {
