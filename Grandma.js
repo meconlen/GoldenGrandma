@@ -79,6 +79,7 @@ function best_building()
       Math.ceil(time_to_buy) / Math.pow(10, Math.floor(Math.log10(Math.ceil(time_to_buy)))) == Math.round( Math.ceil(time_to_buy) / Math.pow(10, Math.floor(Math.log10(Math.ceil(time_to_buy))))  ) 
    ) {
       best_building.last_best = best_cps_building;
+      best_building.last_time_to_buy = Math.ceil(time_to_buy);
       console.log("time to buy", best_cps_building, " (", Beautify(Game.Objects[best_cps_building].getPrice()) , ") is", Math.ceil(time_to_buy));
    }
       // lets see if we can do better
@@ -144,9 +145,6 @@ function buy_available_upgrades()
    }
 }
 
-// var autoClicker = setInterval(Game.ClickCookie, 50);
-// var autoGolden = setInterval(click_golden, 50);
-
 var clicker = 0;
 var buyer = 0;
 
@@ -156,6 +154,7 @@ function click()
    Game.ClickCookie();
    click_golden();
 }
+
 
 
 function buy()
