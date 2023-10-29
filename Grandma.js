@@ -107,7 +107,7 @@ function get_next_cookie_upgrade()
    var max_cookie_upgrade = -1;
    var max_cookie_upgrade_value = 0;
    for (i in Game.UpgradesInStore) {
-      if(Game.UpgradesInStore[i].pool = "cookie") {
+      if(Game.UpgradesInStore[i].pool == "cookie") {
          upgrade_cps = Game.cookiesPs * (Game.UpgradesInStore[i].power / 100);
          upgrade_value = upgrade_cps / Game.UpgradesInStore[i].basePrice;
          if(upgrade_value > max_cookie_upgrade_value) {
@@ -122,7 +122,7 @@ function get_next_cookie_upgrade()
 function get_next_non_cookie_upgrade()
 {
    for(i in Game.UpgradesInStore) {
-      if(Game.UpgradesInStore[i].pool != "cookie") {
+      if(Game.UpgradesInStore[i].pool != 'cookie') {
          return i;
       }
    }
@@ -201,7 +201,7 @@ function buy_best_building()
    } else {
       log_next_purchase(building_price, building);
    }
-};
+}
 
 var clicker = 0;
 var buyer = 0;
