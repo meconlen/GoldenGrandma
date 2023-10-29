@@ -173,7 +173,6 @@ function buy_best_building()
       if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
          console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
          Game.UpgradesInStore[non_cookie_upgrade].buy();
-         buy_best_building();
          buy_best_building.last_next_purchase = '';
       } else {
          log_next_purchase(non_cookie_upgrade_price, Game.UpgradesInStore[non_cookie_upgrade].name);
@@ -189,7 +188,6 @@ function buy_best_building()
          if(Game.UpgradesInStore[cookie_upgrade].canBuy()) {
             console.log("Bought upgrade", Game.UpgradesInStore[cookie_upgrade].name);
             Game.UpgradesInStore[cookie_upgrade].buy();
-            buy_best_building();
             buy_best_building.last_next_purchase = '';
          } else {
             log_next_purchase(cookie_upgrade_price, Game.UpgradesInStore[cookie_upgrade].name);
@@ -203,7 +201,6 @@ function buy_best_building()
    if(building_price < Game.cookies) {
       console.log("bought upgrade", building);
       Game.Objects[building].buy(1);
-      buy_best_building();
       buy_best_building.last_next_purchase = '';
    } else {
       log_next_purchase(building_price, building);
