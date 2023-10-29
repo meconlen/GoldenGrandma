@@ -81,6 +81,8 @@ function best_building()
 
    for (var i in Game.Objects) 
    {
+      // we want to skip grandmas during buffs 
+      if(i == 'Grandma' && Object.keys(Game.buffs).length > 0) { continue; }
       if(Game.Objects[i].getPrice() <= Game.cookies) {
          // how many seconds before the cps > getPrice
          var time_to_pay_for = Game.Objects[i].getPrice() / Game.Objects[i].cps(Game.Objects[i]);
@@ -211,12 +213,9 @@ function click()
    click_golden();
 }
 
-
-
 function buy()
 {
    buy_best_building();
-   // buy_available_upgrades();
 }
 
 
