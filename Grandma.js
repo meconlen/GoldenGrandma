@@ -40,6 +40,7 @@ function best_building_cps_per_building()
    var best_cps_per_building = 0;
    for (var i in Game.Objects) 
    { 
+      if(i == 'Grandma' && Object.keys(Game.buffs).length > 0) { continue; }
       var object_name = Game.Objects[i].name
       // var cps_per_object = Game.Objects[i].cps(Game.Objects[i])/ Game.Objects[i].getPrice()
       var cps_per_object = get_actual_cps(i)/ Game.Objects[i].getPrice()
@@ -82,7 +83,6 @@ function best_building()
    for (var i in Game.Objects) 
    {
       // we want to skip grandmas during buffs 
-      if(i == 'Grandma' && Object.keys(Game.buffs).length > 0) { continue; }
       if(Game.Objects[i].getPrice() <= Game.cookies) {
          // how many seconds before the cps > getPrice
          var time_to_pay_for = Game.Objects[i].getPrice() / Game.Objects[i].cps(Game.Objects[i]);
