@@ -199,7 +199,7 @@ function buy_best_building()
             buy_best_building.last_next_purchase = '';
          } else {
             log_next_purchase(cookie_upgrade_price, Game.UpgradesInStore[cookie_upgrade].name);
-            buy_best_building.last_next_purchase = Game.UpgradesInStore[non_cookie_upgrade].name;
+            buy_best_building.last_next_purchase = Game.UpgradesInStore[cookie_upgrade].name;
          }
          return;
       }
