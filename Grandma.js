@@ -183,6 +183,10 @@ function buy_best_building()
 
    // don't buy cookies during buffs as we can't estimate the value properly 
    // unless the last object was a cookie
+
+   if(debug_level > 0) {
+      console.log(Object.keys(Game.buffs).length, buy_best_building.last_next_purchase, Game.Upgrades[buy_best_building.last_next_purchase].pool);
+   }
    if(Object.keys(Game.buffs).length == 0 || (buy_best_building.last_next_purchase in Game.Upgrades && Game.Upgrades[buy_best_building.last_next_purchase].pool == 'cookie')) {
       if(cookie_upgrade_value > building_value) {
          if(Game.UpgradesInStore[cookie_upgrade].canBuy()) {
@@ -210,7 +214,7 @@ function buy_best_building()
 
 var clicker = 0;
 var buyer = 0;
-
+var debug_level = 0;
 
 function click()
 {
@@ -222,7 +226,6 @@ function buy()
 {
    buy_best_building();
 }
-
 
 function start_game()
 {
@@ -236,12 +239,14 @@ function stop_game()
    clearInterval(buyer);
 }
 
-
 function reset_game()
 {
    Game.Reset();
 }
 
-
+function debug_game(val)
+{
+   debug_level = val;
+}
 
 
