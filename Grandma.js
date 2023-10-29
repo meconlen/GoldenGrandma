@@ -199,7 +199,7 @@ function buy_best_building()
    // Nothing left but a building to buy
 
    if(building_price < Game.cookies) {
-      console.log("bought upgrade", building);
+      console.log("bought building", building);
       Game.Objects[building].buy(1);
       buy_best_building.last_next_purchase = '';
    } else {
