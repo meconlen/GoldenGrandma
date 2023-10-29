@@ -73,16 +73,9 @@ function best_building()
 
    // if we can't get the most valuable building it will take us this time_to_buy
    var time_to_buy = (Game.Objects[best_cps_building].getPrice() - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
-   if(best_cps_building != best_building.last_best || 
-      Math.ceil(time_to_buy) > best_building.last_time_to_buy ||
-      Math.ceil(time_to_buy) < 10 || 
-      Math.ceil(time_to_buy) / Math.pow(10, Math.floor(Math.log10(Math.ceil(time_to_buy)))) == Math.round( Math.ceil(time_to_buy) / Math.pow(10, Math.floor(Math.log10(Math.ceil(time_to_buy))))  ) 
-   ) {
-      best_building.last_best = best_cps_building;
-      best_building.last_time_to_buy = Math.ceil(time_to_buy);
-      console.log("time to buy", best_cps_building, " (", Beautify(Game.Objects[best_cps_building].getPrice()) , ") is", Math.ceil(time_to_buy));
-   }
-      // lets see if we can do better
+ 
+   // lets see if we can do better by buying something that will pay for itself before time_to_buy
+   // turns out I don't think this ever is true
    var fastest_payoff_i = best_cps_building;
    var least_time_to_pay_for = time_to_buy;
 
@@ -107,43 +100,106 @@ function best_building()
    return fastest_payoff_i;
 }
 
+function get_next_cookie_upgrade()
+{
+   var max_cookie_upgrade = -1;
+   var max_cookie_upgrade_value = 0;
+   for (i in Game.UpgradesInStore) {
+      if(Game.UpgradesInStore[i].pool = "cookie") {
+         upgrade_cps = Game.cookiesPs * (Game.UpgradesInStore[i].power / 100);
+         upgrade_value = upgrade_cps / Game.UpgradesInStore[i].basePrice;
+         if(upgrade_value > max_cookie_upgrade_value) {
+            max_cookie_upgrade_value = upgrade_value;
+            max_cookie_upgrade = i;
+         }
+      }
+   }
+   return max_cookie_upgrade;
+}
+
+function get_next_non_cookie_upgrade()
+{
+   for(i in Game.UpgradesInStore) {
+      if(Game.UpgradesInStore[i].pool != "cookie") {
+         return i;
+      }
+   }
+   return -1;
+}
+
+function log_next_purchase(price, name) {
+   var time_to_buy = Math.ceil((price - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50)));
+
+   if(
+      name != log_next_purchase.last_name ||
+      time_to_buy > log_next_purchase.last_time_to_buy ||
+      time_to_buy < 10 ||
+      Math.abs(time_to_buy - log_next_purchase.last_tick_time_to_buy) > 2 ||
+      time_to_buy / Math.pow(10, Math.floor(Math.log10(time_to_buy))) == Math.round(time_to_buy / Math.pow(10, Math.floor(Math.log10(time_to_buy)))) 
+      )
+   {
+      log_next_purchase.last_time_to_buy = time_to_buy;
+      log_next_purchase.last_name = name;
+      console.log("time to", name, "(", Beautify(price), ") is", Math.ceil(time_to_buy) );
+   }
+   log_next_purchase.last_tick_time_to_buy = time_to_buy;
+}
 
 function buy_best_building()
 {
    var building = best_building();
    var building_cps = get_actual_cps(building);
-   var cookie;
-   // only do this if not shimmering since shimmers bust the computations 
+   var building_price = Game.Objects[building].getPrice();
+   var building_value = building_cps / building_price;
+
+   var cookie_upgrade = get_next_cookie_upgrade();
+   var cookie_upgrade_cps = Game.cookiesPs * (Game.UpgradesInStore[cookie_upgrade].power / 100);
+   var cookie_upgrade_price = Game.UpgradesInStore[cookie_upgrade].basePrice;
+   var cookie_upgrade_value = cookie_upgrade_cps / cookie_upgrade_price;
+
+   var non_cookie_upgrade = get_next_non_cookie_upgrade();
+   var non_cookie_upgrade_price = -1;
+   if(non_cookie_upgrade != -1) {
+      non_cookie_upgrade_price = Game.UpgradesInStore[non_cookie_upgrade].getPrice();      
+   }
+
+   // if there's a non-cookie upgrade that's cheaper than the best building we buy that
+   // if there's not, then it's either the building or the cookie based on value 
+
+   if(non_cookie_upgrade_price > 0 && non_cookie_upgrade_price < building_price) {
+      if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
+         console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
+         Game.UpgradesInStore[non_cookie_upgrade].buy();
+         buy_best_building();
+      } else {
+         log_next_purchase(non_cookie_upgrade_price, Game.UpgradesInStore[non_cookie_upgrade].name);
+      }
+      return;
+   }
+
+   // don't buy cookies during buffs as we can't estimate the value properly 
    if(Object.keys(Game.buffs).length == 0) {
-      for (i in Game.UpgradesInStore)
-      {
-         if(Game.UpgradesInStore[i].pool == "cookie") {
-            upgrade_cps = Game.cookiesPs * (Game.UpgradesInStore[i].power / 100);
-            if(upgrade_cps > building_cps) {
-               if(Game.UpgradesInStore[i].canBuy()) {
-                  Game.UpgradesInStore[i].buy();
-               }
-            }
+      if(cookie_upgrade_value > building_value) {
+         if(Game.UpgradesInStore[cookie_upgrade].canBuy()) {
+            console.log("Bought upgrade", Game.UpgradesInStore[cookie_upgrade].name);
+            Game.UpgradesInStore[cookie_upgrade].buy();
+            buy_best_building();
+         } else {
+            log_next_purchase(cookie_upgrade_price, Game.UpgradesInStore[cookie_upgrade].name);
          }
+         return;
       }
    }
-   if(Game.Objects[building].getPrice() < Game.cookies) {
+   // Nothing left but a building to buy
+
+   if(building_price < Game.cookies) {
+      console.log("bought upgrade", building);
       Game.Objects[building].buy(1);
       buy_best_building();
+   } else {
+      log_next_purchase(building_price, building);
    }
 };
-
-function buy_available_upgrades()
-{
-   for(var i in Game.UpgradesInStore) {
-      if(Game.UpgradesInStore[i].name != 'One mind') {
-         if(Game.UpgradesInStore[i].canBuy() && Game.UpgradesInStore[i].pool != "cookie") {
-            console.log("bought upgrade ", Game.UpgradesInStore[i].name);
-            Game.UpgradesInStore[i].buy();
-         }
-      }
-   }
-}
 
 var clicker = 0;
 var buyer = 0;
@@ -160,7 +216,7 @@ function click()
 function buy()
 {
    buy_best_building();
-   buy_available_upgrades();
+   // buy_available_upgrades();
 }
 
 
