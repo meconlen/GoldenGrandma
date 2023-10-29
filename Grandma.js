@@ -176,7 +176,7 @@ function buy_best_building()
    if(debug_level > 0) {
       console.log('non-cookie check', non_cookie_upgrade_price.toExponential(4), building_price.toExponential(4), cookie_upgrade_price.toExponential(4));
    }
-   if(non_cookie_upgrade_price > 0 && (non_cookie_upgrade_price < building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price )) {
+   if(non_cookie_upgrade_price > 0 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
       if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
          console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
          Game.UpgradesInStore[non_cookie_upgrade].buy();
