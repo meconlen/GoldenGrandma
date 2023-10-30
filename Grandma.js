@@ -3,6 +3,12 @@ var buyer = 0;
 var lumps = 0;
 var debug_level = 0;
 
+// https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
+
+function sleep(ms) {
+   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 function click_golden() {
    Game.shimmers.forEach(
@@ -158,7 +164,7 @@ function log_next_purchase(price, name) {
    log_next_purchase.last_tick_time_to_buy = time_to_buy;
 }
 
-function buy_best_building()
+async function buy_best_building()
 { 
    while(true) {
       var building = best_building();
@@ -195,6 +201,7 @@ function buy_best_building()
             console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
             Game.UpgradesInStore[non_cookie_upgrade].buy();
             buy_best_building.last_next_purchase = '';
+            await sleep(50)
             continue;
          } else {
             log_next_purchase(non_cookie_upgrade_price, Game.UpgradesInStore[non_cookie_upgrade].name);
@@ -216,6 +223,7 @@ function buy_best_building()
                console.log("Bought upgrade", Game.UpgradesInStore[cookie_upgrade].name);
                Game.UpgradesInStore[cookie_upgrade].buy();
                buy_best_building.last_next_purchase = '';
+               await sleep(50)
                continue;
             } else {
                log_next_purchase(cookie_upgrade_price, Game.UpgradesInStore[cookie_upgrade].name);
@@ -230,6 +238,7 @@ function buy_best_building()
          console.log("bought building", building);
          Game.Objects[building].buy(1);
          buy_best_building.last_next_purchase = '';
+         await sleep(50)
          continue;
       } else {
          log_next_purchase(building_price, building);
