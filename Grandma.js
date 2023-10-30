@@ -128,7 +128,10 @@ function get_next_non_cookie_upgrade()
 {
    for(i in Game.UpgradesInStore) {
       if(Game.UpgradesInStore[i].pool != 'cookie') {
-         return i;
+         var no_purchase = ['One mind'];
+         if(! no_purchase.includes(Game.UpgradesInStore[i].name)) {
+            return i;
+         }
       }
    }
    return -1;
@@ -174,7 +177,10 @@ function buy_best_building()
    // if there's not, then it's either the building or the cookie based on value 
 
    if(debug_level > 0) {
-      console.log('non-cookie check', non_cookie_upgrade_price.toExponential(4), building_price.toExponential(4), cookie_upgrade_price.toExponential(4), (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) ));
+      console.log('non-cookie check', non_cookie_upgrade_price.toExponential(4), 
+         building_price.toExponential(4), 
+         cookie_upgrade_price.toExponential(4), 
+         (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) ));
    }
    if(non_cookie_upgrade_price > 0 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
       if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
