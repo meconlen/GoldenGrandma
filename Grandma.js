@@ -159,77 +159,84 @@ function log_next_purchase(price, name) {
 }
 
 function buy_best_building()
-{
-   var building = best_building();
-   var building_cps = get_actual_cps(building);
-   var building_price = Game.Objects[building].getPrice();
-   var building_value = building_cps / building_price;
+{ 
+   while(true) {
+      var building = best_building();
+      var building_cps = get_actual_cps(building);
+      var building_price = Game.Objects[building].getPrice();
+      var building_value = building_cps / building_price;
 
-   var cookie_upgrade = get_next_cookie_upgrade();
-   var cookie_upgrade_cps = 1;
-   var cookie_upgrade_price = 1000000000000000000;
-   var cookie_upgrade_value = 0; 
-   if(cookie_upgrade >= 0) {
-      cookie_upgrade_cps = (cookie_upgrade == -1 ? Game.cookiesPs : Game.cookiesPs * (Game.UpgradesInStore[cookie_upgrade].power / 100));
-      cookie_upgrade_price = Game.UpgradesInStore[cookie_upgrade].basePrice;
-      cookie_upgrade_value = cookie_upgrade_cps / cookie_upgrade_price;
-   } 
-   var non_cookie_upgrade = get_next_non_cookie_upgrade();
-   var non_cookie_upgrade_price = -1;
-   if(non_cookie_upgrade != -1) {
-      non_cookie_upgrade_price = Game.UpgradesInStore[non_cookie_upgrade].getPrice();      
-   }
-
-   // if there's a non-cookie upgrade that's cheaper than the best building or other upgrade we buy that
-   // if there's not, then it's either the building or the cookie based on value 
-
-   if(debug_level > 0) {
-      console.log('non-cookie check', non_cookie_upgrade_price.toExponential(4), 
-         building_price.toExponential(4), 
-         cookie_upgrade_price.toExponential(4), 
-         (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) ));
-   }
-   if(non_cookie_upgrade_price > 0 && cookie_upgrade != -1 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
-      if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
-         console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
-         Game.UpgradesInStore[non_cookie_upgrade].buy();
-         buy_best_building.last_next_purchase = '';
-      } else {
-         log_next_purchase(non_cookie_upgrade_price, Game.UpgradesInStore[non_cookie_upgrade].name);
-         buy_best_building.last_next_purchase = Game.UpgradesInStore[non_cookie_upgrade].name;
+      var cookie_upgrade = get_next_cookie_upgrade();
+      var cookie_upgrade_cps = 1;
+      var cookie_upgrade_price = 1000000000000000000;
+      var cookie_upgrade_value = 0; 
+      if(cookie_upgrade >= 0) {
+         cookie_upgrade_cps = (cookie_upgrade == -1 ? Game.cookiesPs : Game.cookiesPs * (Game.UpgradesInStore[cookie_upgrade].power / 100));
+         cookie_upgrade_price = Game.UpgradesInStore[cookie_upgrade].basePrice;
+         cookie_upgrade_value = cookie_upgrade_cps / cookie_upgrade_price;
+      } 
+      var non_cookie_upgrade = get_next_non_cookie_upgrade();
+      var non_cookie_upgrade_price = -1;
+      if(non_cookie_upgrade != -1) {
+         non_cookie_upgrade_price = Game.UpgradesInStore[non_cookie_upgrade].getPrice();      
       }
-      return;
-   }
 
-   // don't buy cookies during buffs as we can't estimate the value properly 
-   // unless the last object was a cookie
+      // if there's a non-cookie upgrade that's cheaper than the best building or other upgrade we buy that
+      // if there's not, then it's either the building or the cookie based on value 
 
-   if(debug_level > 0) {
-      console.log(Object.keys(Game.buffs).length, buy_best_building.last_next_purchase, buy_best_building.last_next_purchase in Game.Upgrades ? Game.Upgrades[buy_best_building.last_next_purchase].pool : "non-upgrade");
-      console.log("upgrade values", cookie_upgrade_value, building_value);
-   }
-   if(cookie_upgrade != -1 &&  ( Object.keys(Game.buffs).length == 0 || (buy_best_building.last_next_purchase in Game.Upgrades && Game.Upgrades[buy_best_building.last_next_purchase].pool == 'cookie')) ) {
-      if(cookie_upgrade_value > building_value) {
-         if(Game.UpgradesInStore[cookie_upgrade].canBuy()) {
-            console.log("Bought upgrade", Game.UpgradesInStore[cookie_upgrade].name);
-            Game.UpgradesInStore[cookie_upgrade].buy();
+      if(debug_level > 0) {
+         console.log('non-cookie check', non_cookie_upgrade_price.toExponential(4), 
+            building_price.toExponential(4), 
+            cookie_upgrade_price.toExponential(4), 
+            (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) ));
+      }
+      if(non_cookie_upgrade_price > 0 && cookie_upgrade != -1 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
+         if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
+            console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
+            Game.UpgradesInStore[non_cookie_upgrade].buy();
             buy_best_building.last_next_purchase = '';
+            continue;
          } else {
-            log_next_purchase(cookie_upgrade_price, Game.UpgradesInStore[cookie_upgrade].name);
-            buy_best_building.last_next_purchase = Game.UpgradesInStore[cookie_upgrade].name;
+            log_next_purchase(non_cookie_upgrade_price, Game.UpgradesInStore[non_cookie_upgrade].name);
+            buy_best_building.last_next_purchase = Game.UpgradesInStore[non_cookie_upgrade].name;
+            return;
          }
+      }
+
+      // don't buy cookies during buffs as we can't estimate the value properly 
+      // unless the last object was a cookie
+
+      if(debug_level > 0) {
+         console.log(Object.keys(Game.buffs).length, buy_best_building.last_next_purchase, buy_best_building.last_next_purchase in Game.Upgrades ? Game.Upgrades[buy_best_building.last_next_purchase].pool : "non-upgrade");
+         console.log("upgrade values", cookie_upgrade_value, building_value);
+      }
+      if(cookie_upgrade != -1 &&  ( Object.keys(Game.buffs).length == 0 || (buy_best_building.last_next_purchase in Game.Upgrades && Game.Upgrades[buy_best_building.last_next_purchase].pool == 'cookie')) ) {
+         if(cookie_upgrade_value > building_value) {
+            if(Game.UpgradesInStore[cookie_upgrade].canBuy()) {
+               console.log("Bought upgrade", Game.UpgradesInStore[cookie_upgrade].name);
+               Game.UpgradesInStore[cookie_upgrade].buy();
+               buy_best_building.last_next_purchase = '';
+               continue;
+            } else {
+               log_next_purchase(cookie_upgrade_price, Game.UpgradesInStore[cookie_upgrade].name);
+               buy_best_building.last_next_purchase = Game.UpgradesInStore[cookie_upgrade].name;
+               return;
+            }
+         }
+      }
+      // Nothing left but a building to buy
+
+      if(building_price < Game.cookies) {
+         console.log("bought building", building);
+         Game.Objects[building].buy(1);
+         buy_best_building.last_next_purchase = '';
+         continue;
+      } else {
+         log_next_purchase(building_price, building);
+         buy_best_building.last_next_purchase = building;
          return;
       }
-   }
-   // Nothing left but a building to buy
-
-   if(building_price < Game.cookies) {
-      console.log("bought building", building);
-      Game.Objects[building].buy(1);
-      buy_best_building.last_next_purchase = '';
-   } else {
-      log_next_purchase(building_price, building);
-      buy_best_building.last_next_purchase = building;
+      break;
    }
 }
 
