@@ -1,6 +1,8 @@
 var clicker = 0;
 var buyer = 0;
+var lumps = 0;
 var debug_level = 0;
+
 
 function click_golden() {
    Game.shimmers.forEach(
@@ -121,14 +123,15 @@ function get_next_cookie_upgrade()
          }
       }
    }
+   if(debug)
    return max_cookie_upgrade;
 }
 
 function get_next_non_cookie_upgrade()
 {
    for(i in Game.UpgradesInStore) {
-      if(Game.UpgradesInStore[i].pool != 'cookie') {
-         var no_purchase = ['One mind'];
+      if(Game.UpgradesInStore[i].pool != 'cookie' && Game.UpgradesInStore[i].pool != 'toggle') {
+         var no_purchase = ['One mind', 'Festive biscuit', 'Ghostly biscuit', 'Lovesick biscuit', "Fool's biscuit", 'Bunny biscuit'];
          if(! no_purchase.includes(Game.UpgradesInStore[i].name)) {
             return i;
          }
@@ -163,10 +166,14 @@ function buy_best_building()
    var building_value = building_cps / building_price;
 
    var cookie_upgrade = get_next_cookie_upgrade();
-   var cookie_upgrade_cps = Game.cookiesPs * (Game.UpgradesInStore[cookie_upgrade].power / 100);
-   var cookie_upgrade_price = Game.UpgradesInStore[cookie_upgrade].basePrice;
-   var cookie_upgrade_value = cookie_upgrade_cps / cookie_upgrade_price;
-
+   var cookie_upgrade_cps = 1;
+   var cookie_upgrade_price = 1000000000000000000;
+   var cookie_upgrade_value = 0; 
+   if(cookie_upgrade >= 0) {
+      cookie_upgrade_cps = (cookie_upgrade == -1 ? Game.cookiesPs : Game.cookiesPs * (Game.UpgradesInStore[cookie_upgrade].power / 100));
+      cookie_upgrade_price = Game.UpgradesInStore[cookie_upgrade].basePrice;
+      cookie_upgrade_value = cookie_upgrade_cps / cookie_upgrade_price;
+   } 
    var non_cookie_upgrade = get_next_non_cookie_upgrade();
    var non_cookie_upgrade_price = -1;
    if(non_cookie_upgrade != -1) {
@@ -182,7 +189,7 @@ function buy_best_building()
          cookie_upgrade_price.toExponential(4), 
          (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) ));
    }
-   if(non_cookie_upgrade_price > 0 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
+   if(non_cookie_upgrade_price > 0 && cookie_upgrade != -1 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
       if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
          console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
          Game.UpgradesInStore[non_cookie_upgrade].buy();
@@ -199,8 +206,9 @@ function buy_best_building()
 
    if(debug_level > 0) {
       console.log(Object.keys(Game.buffs).length, buy_best_building.last_next_purchase, buy_best_building.last_next_purchase in Game.Upgrades ? Game.Upgrades[buy_best_building.last_next_purchase].pool : "non-upgrade");
+      console.log("upgrade values", cookie_upgrade_value, building_value);
    }
-   if(Object.keys(Game.buffs).length == 0 || (buy_best_building.last_next_purchase in Game.Upgrades && Game.Upgrades[buy_best_building.last_next_purchase].pool == 'cookie')) {
+   if(cookie_upgrade != -1 &&  ( Object.keys(Game.buffs).length == 0 || (buy_best_building.last_next_purchase in Game.Upgrades && Game.Upgrades[buy_best_building.last_next_purchase].pool == 'cookie')) ) {
       if(cookie_upgrade_value > building_value) {
          if(Game.UpgradesInStore[cookie_upgrade].canBuy()) {
             console.log("Bought upgrade", Game.UpgradesInStore[cookie_upgrade].name);
@@ -236,10 +244,55 @@ function buy()
    buy_best_building();
 }
 
+function spend_lumps()
+{
+   // Game.Objects['Wizard tower'].levelUp()
+   if(Game.lumps > 0) {
+      if(Game.Objects['Wizard tower'].level == 0) {
+         Game.Objects['Wizard tower'].levelUp();
+         return;
+      }
+      if(Game.Objects['Temple'].level == 0) {
+         Game.Objects['Temple'].levelUp();
+         return;
+      }
+      if(Game.Objects['Farm'].level == 0) {
+         Game.Objects['Farm'].levelUp();
+         return;
+      }
+      if(Game.Objects['Bank'].level == 0) {
+         Game.Objects['Bank'].levelUp();
+         return;
+      }
+      if(Game.Objects['Farm'].level < 9) {
+         Game.Objects['Farm'].levelUp();
+         return;
+      }
+      if(Game.Objects['Cursor'].level == 0) {
+         Game.Objects['Cursor'].levelUp();
+         return;
+      }
+      if(Game.lumps < 100) {
+         return; 
+      }
+      if(Game.Objects['Farm'].level < 10) {
+         Game.Objects['Farm'].levelUp();
+         return;
+      }
+      if(Game.Objects['Cursor'].level < 20) {
+         Game.Objects['Cursor'].levelUp();
+         return;
+      }      
+   }
+
+};
+
+
 function start_game()
 {
    clicker = setInterval(click, 50);
    buyer = setInterval(buy, 1000);
+   lumps = setInterval(spend_lumps, 1000);
 }
 
 function stop_game()
