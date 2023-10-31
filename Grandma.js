@@ -104,7 +104,7 @@ function best_building()
       // we want to skip grandmas during buffs 
       if(Game.Objects[i].getPrice() <= Game.cookies) {
          // how many seconds before the cps > getPrice
-         var time_to_pay_for = Game.Objects[i].getPrice() / real_cps_per_buiding(Game.Objects[i]);
+         var time_to_pay_for = Game.Objects[i].getPrice() / real_cps_per_buiding(i);
          // if it will pay for itself
          if(time_to_pay_for < time_to_buy)
          {
