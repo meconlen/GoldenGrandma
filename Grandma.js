@@ -23,7 +23,7 @@ function click_golden() {
 
 function real_cps_per_buiding(building)
 {
-   return (Game.Objects[building].storedTotalCps/Game.Objects[building].amount)*Game.globalCpsMult;
+   return (Game.Objects[building].storedTotalCps / Game.Objects[building].amount == 0 : 1 : Game.Objects[building].amount )*Game.globalCpsMult;
 }
 
 function get_actual_cps(building)
