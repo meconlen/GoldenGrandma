@@ -21,14 +21,17 @@ function click_golden() {
    )
 }
 
+function real_cps_per_buiding(building)
+{
+   return (Game.Objects[building].storedTotalCps/Game.Objects[building].amount)*Game.globalCpsMult;
+}
+
 function get_actual_cps(building)
 {
    if(building != 'Grandma') {
-      return Game.Objects[building].cps(Game.Objects[building]);
+      return real_cps_per_buiding(building);
    }
    var grandma_count = Game.Objects['Grandma'].amount;
-
-
    var synergiesWith={};
    var synergyBoost=0;
    for (var i in Game.GrandmaSynergies) {
@@ -41,7 +44,7 @@ function get_actual_cps(building)
          synergiesWith[other.plural]+=mult;
       }
    }
-   return Game.Objects[building].cps(Game.Objects[building]) + synergyBoost / (grandma_count == 0 ? 1 : grandma_count);
+   return real_cps_per_buiding(building) + synergyBoost / (grandma_count == 0 ? 1 : grandma_count);
 }
 
 
