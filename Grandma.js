@@ -17,9 +17,11 @@ function click_golden() {
       {
          if(shimmer.type == "golden" && shimmer.wrath == 0) {
             shimmer.pop();
+            console.log("Popped golden Cookie");
          }
          if(shimmer.type == "reindeer") {
             shimmer.pop();
+            console.log("Popped reindeer");
          }
       }
    )
