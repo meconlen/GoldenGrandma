@@ -128,7 +128,7 @@ function get_next_cookie_upgrade()
    var max_cookie_upgrade_value = 0;
    for (i in Game.UpgradesInStore) {
       if(Game.UpgradesInStore[i].pool == "cookie") {
-         upgrade_cps = Game.cookiesPs * (Game.UpgradesInStore[i].power / 100);
+         upgrade_cps = Game.cookiesPs * (get_cookie_power(Game.UpgradesInStore[i]) / 100);
          upgrade_value = upgrade_cps / Game.UpgradesInStore[i].basePrice;
          if(upgrade_value > max_cookie_upgrade_value) {
             max_cookie_upgrade_value = upgrade_value;
@@ -171,6 +171,16 @@ function log_next_purchase(price, name) {
    log_next_purchase.last_tick_time_to_buy = time_to_buy;
 }
 
+
+function get_cookie_power(upgrade)
+{
+   if(typeof upgrade.power == 'function') {
+      return upgrade.power();
+   } else {
+      return upgrade.power;
+   }
+}
+
 async function buy_best_building()
 { 
    while(true) {
@@ -181,10 +191,10 @@ async function buy_best_building()
 
       var cookie_upgrade = get_next_cookie_upgrade();
       var cookie_upgrade_cps = 1;
-      var cookie_upgrade_price = 1000000000000000000;
+      var cookie_upgrade_price = 10000000000000000000000000000;
       var cookie_upgrade_value = 0; 
       if(cookie_upgrade >= 0) {
-         cookie_upgrade_cps = (cookie_upgrade == -1 ? Game.cookiesPs : Game.cookiesPs * (Game.UpgradesInStore[cookie_upgrade].power / 100));
+         cookie_upgrade_cps = (cookie_upgrade == -1 ? Game.cookiesPs : Game.cookiesPs * (get_cookie_power(Game.UpgradesInStore[cookie_upgrade]) / 100));
          cookie_upgrade_price = Game.UpgradesInStore[cookie_upgrade].basePrice;
          cookie_upgrade_value = cookie_upgrade_cps / cookie_upgrade_price;
       } 
@@ -287,10 +297,6 @@ function spend_lumps()
          Game.Objects['Bank'].levelUp();
          return;
       }
-      if(Game.Objects['Farm'].level < 9) {
-         Game.Objects['Farm'].levelUp();
-         return;
-      }
       if(Game.Objects['Cursor'].level == 0) {
          Game.Objects['Cursor'].levelUp();
          return;
@@ -298,14 +304,19 @@ function spend_lumps()
       if(Game.lumps < 100) {
          return; 
       }
-      if(Game.Objects['Farm'].level < 10) {
-         Game.Objects['Farm'].levelUp();
-         return;
-      }
       if(Game.Objects['Cursor'].level < 20) {
          Game.Objects['Cursor'].levelUp();
          return;
       }      
+      // only because we really don't play the farm yet
+      if(Game.Objects['Farm'].level < 9) {
+         Game.Objects['Farm'].levelUp();
+         return;
+      }
+      if(Game.Objects['Farm'].level < 10) {
+         Game.Objects['Farm'].levelUp();
+         return;
+      }
    }
 
 };
