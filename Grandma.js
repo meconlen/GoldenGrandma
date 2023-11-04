@@ -1,6 +1,7 @@
 var clicker = 0;
 var buyer = 0;
-var lumps = 0;
+var lump_interval = 0;
+var magic_interval = 0;
 var debug_level = 0;
 
 // https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
@@ -309,18 +310,44 @@ function spend_lumps()
 
 };
 
+function cast_magic()
+{
+   // do we have a wizard's tower and is it at last level 1
+   if(Game.Objects['Wizard tower'].amount > 0 && Game.Objects['Wizard tower'].level > 0)
+   {
+      var tower = Game.Objects['Wizard tower'];
+      var mini_game = tower.minigame;
+      var fate_spell = mini_game.spells['hand of fate']
+      var stretch_spell = mini_game.spells['stretch time']
+      
+      var max_magic = mini_game.magicM;
+      var current_magic = mini_game.magic;
+
+      var fate_cost = mini_game.getSpellCost(fate_spell);
+      var stretch_Cost = mini_game.getSpellCost(stretch_spell);
+
+      var buffs = Object.keys(Game.buffs).length;
+      if((current_magic > fate_cost && buffs > 1) || ( current_magic == max_magic && buffs > 0)) {
+         mini_game.castSpell(fate_spell);
+      }
+   }
+}
 
 function start_game()
 {
    clicker = setInterval(click, 50);
    buyer = setInterval(buy, 1000);
-   lumps = setInterval(spend_lumps, 1000);
+   lump_interval = setInterval(spend_lumps, 1000);
+   magic_interval = setInterval(cast_magic, 1000);
+
 }
 
 function stop_game()
 {
    clearInterval(clicker);
    clearInterval(buyer);
+   clearInterval(lump_interval);
+   clearInterval(magic_interval);
 }
 
 function reset_game()
