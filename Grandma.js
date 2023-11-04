@@ -191,7 +191,7 @@ async function buy_best_building()
 
       var cookie_upgrade = get_next_cookie_upgrade();
       var cookie_upgrade_cps = 1;
-      var cookie_upgrade_price = 10000000000000000000000000000;
+      var cookie_upgrade_price = 1;
       var cookie_upgrade_value = 0; 
       if(cookie_upgrade >= 0) {
          cookie_upgrade_cps = (cookie_upgrade == -1 ? Game.cookiesPs : Game.cookiesPs * (get_cookie_power(Game.UpgradesInStore[cookie_upgrade]) / 100));
@@ -213,7 +213,11 @@ async function buy_best_building()
             cookie_upgrade_price.toExponential(4), 
             (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) ));
       }
-      if(non_cookie_upgrade_price > 0 && cookie_upgrade != -1 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
+
+      // we want the non-cookie prie to be positive 
+      // and hte non-cookie price to be less than the price of the most valuable other purchase 
+      
+      if(non_cookie_upgrade_price > 0 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
          if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
             console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
             Game.UpgradesInStore[non_cookie_upgrade].buy();
