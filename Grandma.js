@@ -446,7 +446,13 @@ function upgrade_dragon()
    if(Game.dragnLevel == 5) {
       Game.specialTab='dragon';
       Game.ToggleSpecialMenu(1);
-      Game.SetDragonAura(1,0);
+      // Game.SetDragonAura(1,0);
+      Game.dragonAura=1;
+      var highestBuilding=0;
+      for (var i in Game.Objects) {if (Game.Objects[i].amount>0) highestBuilding=Game.Objects[i];}
+      if(highestBuilding!=0) {
+         Game.ObjectsById[highestBuilding.id].sacrifice(1);
+      } 
       clearInterval(dragon_interval);
    }
 }
