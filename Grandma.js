@@ -444,6 +444,9 @@ function upgrade_dragon()
       Game.specialTab='';
    }
    if(Game.dragnLevel == 5) {
+      Game.specialTab='dragon';
+      Game.ToggleSpecialMenu(1);
+      Game.SetDragonAura(1,0);
       clearInterval(dragon_interval);
    }
 }
