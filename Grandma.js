@@ -394,8 +394,28 @@ function do_ascention()
    var earned_level = Math.floor(Game.HowMuchPrestige(Game.cookiesReset+Game.cookiesEarned) - Game.HowMuchPrestige(Game.cookiesReset));
    var run_seconds = (Date.now() - Game.startDate)/1000;
    var next_building = best_ascention_building_cps_per_building()
-   var next_building_cps = get_actual_cps(next_building);
-   var time_to_buy = (Game.Objects[next_building].getPrice() - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
+   var time_to_buy_building = (Game.Objects[next_building].getPrice() - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
+
+   var building_cps = get_actual_cps(next_building);
+   var building_price = Game.Objects[next_building].getPrice();
+   var building_value = building_cps / building_price;
+
+
+   var cookie_upgrade = get_next_cookie_upgrade();
+   var cookie_upgrade_cps = 1;
+   var cookie_upgrade_price = 1;
+   var cookie_upgrade_value = 0; 
+   if(cookie_upgrade >= 0) {
+      cookie_upgrade_cps = (cookie_upgrade == -1 ? Game.cookiesPs : Game.cookiesPs * (get_cookie_power(Game.UpgradesInStore[cookie_upgrade]) / 100));
+      cookie_upgrade_price = Game.UpgradesInStore[cookie_upgrade].getPrice();
+      cookie_upgrade_value = cookie_upgrade_cps / cookie_upgrade_price;
+   } 
+
+   var time_to_buy = time_to_buy_building;
+   if(cookie_upgrade_value > 0 && cookie_upgrade_value > building_value) {
+      time_to_buy = (cookie_upgrade_price - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
+   }
+
 
    if(
       (current_level == 0 && earned_level > 213) 
