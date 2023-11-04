@@ -3,6 +3,7 @@ var buyer = 0;
 var lump_interval = 0;
 var magic_interval = 0;
 var ascention_interval = 0;
+var dragon_interval = 0;
 var debug_level = 0;
 
 // https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
@@ -433,6 +434,16 @@ async function do_ascention()
    
 }
 
+function upgrade_dragon()
+{
+   if(Game.Has('A crumbly egg') && Game.dragonLevel < 4) {
+      Game.UpgradeDragon();
+   }
+   if(Game.dragnLevel == 4) {
+      clearInterval(dragon_interval);
+   }
+}
+
 function start_game()
 {
    clicker = setInterval(click, 50);
@@ -440,6 +451,7 @@ function start_game()
    lump_interval = setInterval(spend_lumps, 1000);
    magic_interval = setInterval(cast_magic, 1000);
    ascention_interval = setInterval(do_ascention, 1000);
+   dragon_interval = setInterval(upgrade_dragon, 1000);
 }
 
 function stop_game()
@@ -449,6 +461,7 @@ function stop_game()
    clearInterval(lump_interval);
    clearInterval(magic_interval);
    clearInterval(ascention_interval);
+   clearInterval(dragon_interval);
 }
 
 function reset_game()
