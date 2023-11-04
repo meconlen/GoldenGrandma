@@ -416,7 +416,9 @@ function do_ascention()
       time_to_buy = (cookie_upgrade_price - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
    }
 
-
+   if(debug_level > 0) {
+      console.log("time to buy =", time_to_buy, "run seconds =", run_seconds);
+   }
    if(
       (current_level == 0 && earned_level > 213) 
       || (earned_level > current_level && current_level > 0 ) 
