@@ -436,9 +436,13 @@ async function do_ascention()
 
 function upgrade_dragon()
 {
-   // if(Game.Has('A crumbly egg') && Game.dragonLevel < 5) {
-   //    Game.UpgradeDragon();
-   // }
+   if(Game.Has('A crumbly egg') && Game.dragonLevel < 5) {
+      Game.specialTab='dragon';
+      Game.ToggleSpecialMenu(1);
+      Game.UpgradeDragon();
+      Game.ToggleSpecialMenu(0);
+      Game.specialTab='';
+   }
    if(Game.dragnLevel == 5) {
       clearInterval(dragon_interval);
    }
