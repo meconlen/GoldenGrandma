@@ -2,6 +2,7 @@ var clicker = 0;
 var buyer = 0;
 var lump_interval = 0;
 var magic_interval = 0;
+var ascention_interval = 0;
 var debug_level = 0;
 
 // https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
@@ -220,7 +221,7 @@ async function buy_best_building()
       }
 
       // we want the non-cookie prie to be positive 
-      // and hte non-cookie price to be less than the price of the most valuable other purchase 
+      // and the non-cookie price to be less than the price of the most valuable other purchase 
 
       if(non_cookie_upgrade_price > 0 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
          if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
@@ -336,21 +337,77 @@ function cast_magic()
    if(Game.Objects['Wizard tower'].amount > 0 && Game.Objects['Wizard tower'].level > 0)
    {
       var tower = Game.Objects['Wizard tower'];
-      var mini_game = tower.minigame;
-      var fate_spell = mini_game.spells['hand of fate']
-      var stretch_spell = mini_game.spells['stretch time']
-      
-      var max_magic = mini_game.magicM;
-      var current_magic = mini_game.magic;
+      if(tower.level > 0) {
+         var mini_game = tower.minigame;
+         var fate_spell = mini_game.spells['hand of fate']
+         var stretch_spell = mini_game.spells['stretch time']
+         
+         var max_magic = mini_game.magicM;
+         var current_magic = mini_game.magic;
 
-      var fate_cost = mini_game.getSpellCost(fate_spell);
-      var stretch_Cost = mini_game.getSpellCost(stretch_spell);
+         var fate_cost = mini_game.getSpellCost(fate_spell);
+         var stretch_Cost = mini_game.getSpellCost(stretch_spell);
 
-      var buffs = Object.keys(Game.buffs).length;
-      if((current_magic > fate_cost && buffs > 1) || ( current_magic == max_magic && buffs > 0)) {
-         mini_game.castSpell(fate_spell);
+         var buffs = Object.keys(Game.buffs).length;
+         if((current_magic > fate_cost && buffs > 1) || ( current_magic == max_magic && buffs > 0)) {
+            mini_game.castSpell(fate_spell);
+         }
       }
    }
+}
+
+// Game.Ascend(true);
+// Game.Reincarnate(true);
+// Game.prestige == current level 
+// Game.HowMuchPrestige(Game.cookiesReset+Game.cookiesEarned) - Game.HowMuchPrestige(Game.cookiesReset) = how much we would get
+
+// Ascend at 213
+// we always want to reset when we would earn as many as we have 
+
+// seconds in game is (Date.now() - Game.startDate)/1000
+// if the seconds in game is greater than the next building then we aren't getting anywhere
+
+
+function best_ascention_building_cps_per_building()
+{
+   var best_i = 0;
+   var best_name = "";
+   var best_cps_per_building = 0;
+   for (var i in Game.Objects) 
+   { 
+      var object_name = Game.Objects[i].name
+      var cps_per_object = get_actual_cps(i)/ Game.Objects[i].getPrice()
+
+      if(cps_per_object > best_cps_per_building) {
+         best_i = i;
+         best_name = object_name;
+         best_cps_per_building = cps_per_object;
+      }
+   }
+   return best_i;
+}
+
+
+function do_ascention()
+{
+   var current_level = Game.prestige;
+   var earned_level = Math.floor(Game.HowMuchPrestige(Game.cookiesReset+Game.cookiesEarned) - Game.HowMuchPrestige(Game.cookiesReset));
+   var run_seconds = (Date.now() - Game.startDate)/1000;
+   var next_building = best_ascention_building_cps_per_building()
+   var next_building_cps = get_actual_cps(next_building);
+   var time_to_buy = (Game.Objects[next_building].getPrice() - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
+
+   if(
+      (current_level == 0 && earned_level > 213) 
+      || (earned_level > current_level && current_level > 0 ) 
+      || (time_to_buy > run_seconds && run_seconds > 60)
+   ) {
+      stop_game();
+      Game.Ascend(true);
+      Game.Reincarnate(true);
+      start_game();
+   }
+   
 }
 
 function start_game()
@@ -359,7 +416,7 @@ function start_game()
    buyer = setInterval(buy, 1000);
    lump_interval = setInterval(spend_lumps, 1000);
    magic_interval = setInterval(cast_magic, 1000);
-
+   ascention_interval = setInterval(do_ascention, 1000);
 }
 
 function stop_game()
@@ -368,6 +425,7 @@ function stop_game()
    clearInterval(buyer);
    clearInterval(lump_interval);
    clearInterval(magic_interval);
+   clearInterval(ascention_interval);
 }
 
 function reset_game()
