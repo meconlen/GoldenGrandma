@@ -434,25 +434,24 @@ async function do_ascention()
    
 }
 
-function upgrade_dragon()
+async function upgrade_dragon()
 {
    if(Game.Has('A crumbly egg') && Game.dragonLevel < 5) {
       Game.specialTab='dragon';
       Game.ToggleSpecialMenu(1);
       Game.UpgradeDragon();
       Game.ToggleSpecialMenu(0);
-      Game.specialTab='';
    }
    if(Game.dragnLevel == 5) {
       Game.specialTab='dragon';
       Game.ToggleSpecialMenu(1);
-      // Game.SetDragonAura(1,0);
       Game.dragonAura=1;
       var highestBuilding=0;
       for (var i in Game.Objects) {if (Game.Objects[i].amount>0) highestBuilding=Game.Objects[i];}
       if(highestBuilding!=0) {
          Game.ObjectsById[highestBuilding.id].sacrifice(1);
       } 
+      await sleep(2000);
       clearInterval(dragon_interval);
    }
 }
