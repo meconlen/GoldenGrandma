@@ -388,7 +388,7 @@ function best_ascention_building_cps_per_building()
 }
 
 
-function do_ascention()
+async function do_ascention()
 {
    var current_level = Game.prestige;
    var earned_level = Math.floor(Game.HowMuchPrestige(Game.cookiesReset+Game.cookiesEarned) - Game.HowMuchPrestige(Game.cookiesReset));
@@ -426,6 +426,7 @@ function do_ascention()
    ) {
       stop_game();
       Game.Ascend(true);
+      await sleep(10000);
       Game.Reincarnate(true);
       start_game();
    }
