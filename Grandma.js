@@ -16,7 +16,10 @@ function click_golden() {
       function(shimmer)
       {
          if(shimmer.type == "golden" && shimmer.wrath == 0) {
-            shimmer.pop()
+            shimmer.pop();
+         }
+         if(shimmer.type == "reindeer") {
+            shimmer.pop();
          }
       }
    )
@@ -216,7 +219,7 @@ async function buy_best_building()
 
       // we want the non-cookie prie to be positive 
       // and hte non-cookie price to be less than the price of the most valuable other purchase 
-      
+
       if(non_cookie_upgrade_price > 0 && (non_cookie_upgrade_price < (building_value > cookie_upgrade_value ? building_price : cookie_upgrade_price) )) {
          if(Game.UpgradesInStore[non_cookie_upgrade].canBuy()) {
             console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
