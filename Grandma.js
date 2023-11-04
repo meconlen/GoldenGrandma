@@ -436,9 +436,9 @@ async function do_ascention()
 
 function upgrade_dragon()
 {
-   if(Game.Has('A crumbly egg') && Game.dragonLevel < 5) {
-      Game.UpgradeDragon();
-   }
+   // if(Game.Has('A crumbly egg') && Game.dragonLevel < 5) {
+   //    Game.UpgradeDragon();
+   // }
    if(Game.dragnLevel == 5) {
       clearInterval(dragon_interval);
    }
