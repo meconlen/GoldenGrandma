@@ -422,7 +422,7 @@ async function do_ascention()
    if(
       (current_level == 0 && earned_level > 213) 
       || (earned_level > current_level && current_level > 0 ) 
-      || (time_to_buy > run_seconds && run_seconds > 60)
+      || ( (time_to_buy > run_seconds*7 || (time_to_buy > run_seconds && run_seconds > 3600) ) && run_seconds > 60)
    ) {
       stop_game();
       Game.Ascend(true);
