@@ -420,15 +420,13 @@ async function do_ascention()
                     * (run_seconds + current_item_time));
 
    if(debug_level > 0 || debug_ascention == 1) {
-      console.log("Ascend: current_level =", Beautify(current_level), "earned_level =", Beautify(earned_level));
-      console.log("Ascend: new_run_time =", Math.floor(new_run_time), ", run_seconds =", Math.floor(run_seconds), ", current_item_time =", Math.floor(current_item_time));
+      console.log("Ascend: new_run_time =", Math.ceil(new_run_time), 
+         ", run_seconds =", Math.ceil(run_seconds), 
+         ", current_item_time =", Math.ceil(current_item_time),
+         ", D =", Math.ceil(new_run_time - run_seconds - current_item_time)
+      );
    }
    if(new_run_time < current_item_time && run_seconds > 300) {
-      if(debug_level > 0 || debug_ascention == 1) {
-         console.log("Ascend: current_level =", Beautify(current_level), "earned_level =", Beautify(earned_level));
-         console.log("Ascend: Game.cookiesEarned =", Beautify(Game.cookiesEarned), "next_item_cost =", Beautify(next_item_cost));
-         console.log("Ascend: new_run_time =", Math.floor(new_run_time), ", run_seconds =", Math.floor(run_seconds), ", current_item_time =", Math.floor(current_item_time));
-      }
       stop_game();
       Game.Ascend(true);
       await sleep(10000);
