@@ -414,7 +414,7 @@ async function do_ascention()
 // next_purchase_cost
 
    var new_run_time = ( ((current_level + 100) / ( current_level + earned_level + 100))   // a fraction of the time because of new legacy
-                    * (Game.cookiesEarned - Game.cookies + next_purchase_cost) / (Game.cookiesEarned) ) // longer time to get everything plus next item
+                    * (Game.cookiesEarned + next_purchase_cost) / (Game.cookiesEarned) ) // longer time to get everything plus next item
                     * run_seconds;
 
    var current_item_time = (next_purchase_cost - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
