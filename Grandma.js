@@ -419,7 +419,7 @@ async function do_ascention()
 
    var current_item_time = (next_purchase_cost - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
 
-   if(new_run_time < current_item_time) {
+   if(new_run_time < current_item_time && run_seconds > 300) {
       stop_game();
       Game.Ascend(true);
       await sleep(10000);
