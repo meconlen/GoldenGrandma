@@ -413,11 +413,11 @@ async function do_ascention()
    var run_seconds = (Date.now() - Game.startDate)/1000;
 // next_purchase_cost
 
-   var new_run_time = ( ((current_level + 100) / ( current_level + earned_level + 100))   // a fraction of the time because of new legacy
-                    * (Game.cookiesEarned + next_purchase_cost) / (Game.cookiesEarned) ) // longer time to get everything plus next item
-                    * run_seconds;
 
    var current_item_time = (next_purchase_cost - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
+
+   var new_run_time = ( ((current_level + 100) / ( current_level + earned_level + 100))   // a fraction of the time because of new legacy
+                    * (run_seconds + current_item_time));
 
    if(debug_level > 0 || debug_ascention == 1) {
       console.log("Ascend: current_level =", Beautify(current_level), "earned_level =", Beautify(earned_level));
