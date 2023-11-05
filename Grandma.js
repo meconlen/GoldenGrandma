@@ -5,6 +5,9 @@ var magic_interval = 0;
 var ascention_interval = 0;
 var dragon_interval = 0;
 var debug_level = 0;
+var debug_ascention = 0;
+
+var next_purchase_cost = 0;
 
 // https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
 
@@ -229,11 +232,13 @@ async function buy_best_building()
             console.log("Bought upgrade", Game.UpgradesInStore[non_cookie_upgrade].name);
             Game.UpgradesInStore[non_cookie_upgrade].buy();
             buy_best_building.last_next_purchase = '';
+            next_purchase_cost = 0;
             await sleep(50)
             continue;
          } else {
             log_next_purchase(non_cookie_upgrade_price, Game.UpgradesInStore[non_cookie_upgrade].name);
             buy_best_building.last_next_purchase = Game.UpgradesInStore[non_cookie_upgrade].name;
+            next_purchase_cost = non_cookie_upgrade_price;
             return;
          }
       }
@@ -251,11 +256,13 @@ async function buy_best_building()
                console.log("Bought upgrade", Game.UpgradesInStore[cookie_upgrade].name);
                Game.UpgradesInStore[cookie_upgrade].buy();
                buy_best_building.last_next_purchase = '';
+               next_purchase_cost = 0;
                await sleep(50)
                continue;
             } else {
                log_next_purchase(cookie_upgrade_price, Game.UpgradesInStore[cookie_upgrade].name);
                buy_best_building.last_next_purchase = Game.UpgradesInStore[cookie_upgrade].name;
+               next_purchase_cost = cookie_upgrade_price;
                return;
             }
          }
@@ -266,11 +273,13 @@ async function buy_best_building()
          console.log("bought building", building);
          Game.Objects[building].buy(1);
          buy_best_building.last_next_purchase = '';
+         next_purchase_cost = 0;
          await sleep(50)
          continue;
       } else {
          log_next_purchase(building_price, building);
          buy_best_building.last_next_purchase = building;
+         next_purchase_cost = building_price;
          return;
       }
       break;
@@ -389,49 +398,38 @@ function best_ascention_building_cps_per_building()
 }
 
 
+// (prestige to gain / (current level + 100)) 
+
+// new_run_time = (current level + to gain + 100) / (current level + 100)  * (cookies this run + item cost) / (cokies this run) * current time
+// how long it would take to get the cookies to buy the item (plus everything else) in a new run
+
+// new_run_time < time_to_item 
+
+
 async function do_ascention()
 {
    var current_level = Game.prestige;
    var earned_level = Math.floor(Game.HowMuchPrestige(Game.cookiesReset+Game.cookiesEarned) - Game.HowMuchPrestige(Game.cookiesReset));
    var run_seconds = (Date.now() - Game.startDate)/1000;
-   var next_building = best_ascention_building_cps_per_building()
-   var time_to_buy_building = (Game.Objects[next_building].getPrice() - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
+// next_purchase_cost
 
-   var building_cps = get_actual_cps(next_building);
-   var building_price = Game.Objects[next_building].getPrice();
-   var building_value = building_cps / building_price;
+   var new_run_time = ( ((current_level + earned_level + 100) / ( current_level + 100))
+                    * (Game.cookiesEarned + next_purchase_cost) / (Game.cookiesEarned) )
+                    * run_seconds;
 
+   var current_item_time = (next_purchase_cost - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
 
-   var cookie_upgrade = get_next_cookie_upgrade();
-   var cookie_upgrade_cps = 1;
-   var cookie_upgrade_price = 1;
-   var cookie_upgrade_value = 0; 
-   if(cookie_upgrade >= 0) {
-      cookie_upgrade_cps = (cookie_upgrade == -1 ? Game.cookiesPs : Game.cookiesPs * (get_cookie_power(Game.UpgradesInStore[cookie_upgrade]) / 100));
-      cookie_upgrade_price = Game.UpgradesInStore[cookie_upgrade].getPrice();
-      cookie_upgrade_value = cookie_upgrade_cps / cookie_upgrade_price;
-   } 
-
-   var time_to_buy = time_to_buy_building;
-   if(cookie_upgrade_value > 0 && cookie_upgrade_value > building_value) {
-      time_to_buy = (cookie_upgrade_price - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
-   }
-
-   if(debug_level > 0) {
-      console.log("time to buy =", time_to_buy, "run seconds =", run_seconds);
-   }
-   if(
-      (current_level == 0 && earned_level > 213) 
-      || (earned_level > current_level && current_level > 0 ) 
-      || ( (time_to_buy > run_seconds*7 || (time_to_buy > run_seconds && run_seconds > 3600) ) && run_seconds > 60)
-   ) {
+   if(new_run_time < current_item_time) {
       stop_game();
       Game.Ascend(true);
       await sleep(10000);
       Game.Reincarnate(true);
       start_game();
-   }
-   
+   } else {
+      if(debug_level > 0 || debug_ascention == 1) {
+         console.log("Ascend: new_run_time =", Math.floor(new_run_time), ", current_time_time =", Math.floor(current_item_time));
+      }
+   }   
 }
 
 async function upgrade_dragon()
@@ -452,6 +450,7 @@ async function upgrade_dragon()
          Game.ObjectsById[highestBuilding.id].sacrifice(1);
       } 
       await sleep(2000);
+      Game.ToggleSpecialMenu(0);
       clearInterval(dragon_interval);
    }
 }
