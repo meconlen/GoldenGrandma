@@ -427,7 +427,7 @@ async function do_ascention()
       start_game();
    } else {
       if(debug_level > 0 || debug_ascention == 1) {
-         console.log("Ascend: new_run_time =", Math.floor(new_run_time), ", run_seconds =", run_seconds, "", current_time_time =", Math.floor(current_item_time));
+         console.log("Ascend: new_run_time =", Math.floor(new_run_time), ", run_seconds =", Math.floor(run_seconds), ", current_time_time =", Math.floor(current_item_time));
       }
    }   
 }
