@@ -419,16 +419,15 @@ async function do_ascention()
 
    var current_item_time = (next_purchase_cost - Game.cookies) / (Game.cookiesPs + (Game.computedMouseCps * 1000/50));
 
+   if(debug_level > 0 || debug_ascention == 1) {
+      console.log("Ascend: new_run_time =", Math.floor(new_run_time), ", run_seconds =", Math.floor(run_seconds), ", current_item_time =", Math.floor(current_item_time));
+   }
    if(new_run_time < current_item_time && run_seconds > 300) {
       stop_game();
       Game.Ascend(true);
       await sleep(10000);
       Game.Reincarnate(true);
       start_game();
-   } else {
-      if(debug_level > 0 || debug_ascention == 1) {
-         console.log("Ascend: new_run_time =", Math.floor(new_run_time), ", run_seconds =", Math.floor(run_seconds), ", current_item_time =", Math.floor(current_item_time));
-      }
    }   
 }
 
