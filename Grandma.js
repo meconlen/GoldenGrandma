@@ -426,7 +426,7 @@ async function do_ascention()
          ", D =", Math.ceil(new_run_time - run_seconds - current_item_time)
       );
    }
-   if(new_run_time < current_item_time && run_seconds > 300) {
+   if(new_run_time < current_item_time && current_item_time > 300) {
       stop_game();
       Game.Ascend(true);
       await sleep(10000);
