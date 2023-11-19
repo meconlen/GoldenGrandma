@@ -359,9 +359,23 @@ function cast_magic()
          var stretch_Cost = mini_game.getSpellCost(stretch_spell);
 
          var buffs = Object.keys(Game.buffs).length;
-         if((current_magic > fate_cost && buffs > 1) || ( current_magic == max_magic && buffs > 0)) {
+         var cast = 0; 
+         if(buffs > 0) {
+            for(var i in Game.buffs) {
+               if(i != "Frenzy") {
+                  if(Game.buffs[i].time > Game.buffs[i].maxTime * 0.8) {
+                     cast = 1;
+                  }
+               }
+            }
+         }
+         // if((current_magic > fate_cost && buffs > 1) || ( current_magic == max_magic && buffs > 0)) {
+         //    mini_game.castSpell(fate_spell);
+         // }
+         if(cast == 1) {
             mini_game.castSpell(fate_spell);
          }
+
       }
    }
 }
@@ -420,11 +434,13 @@ async function do_ascention()
                     * (run_seconds + current_item_time));
 
    if(debug_level > 0 || debug_ascention == 1) {
-      console.log("Ascend: new_run_time =", Math.ceil(new_run_time), 
-         ", run_seconds =", Math.ceil(run_seconds), 
-         ", current_item_time =", Math.ceil(current_item_time),
-         ", D =", Math.ceil(new_run_time - run_seconds - current_item_time)
-      );
+      if(Math.ceil(run_seconds)%10 == 0) {
+         console.log("Ascend: new_run_time =", Math.ceil(new_run_time), 
+            ", run_seconds =", Math.ceil(run_seconds), 
+            ", current_item_time =", Math.ceil(current_item_time),
+            ", D =", Math.ceil(new_run_time - run_seconds - current_item_time)
+         );
+      }
    }
    if(new_run_time < current_item_time && current_item_time > 300) {
       stop_game();
