@@ -169,9 +169,9 @@ function log_next_purchase(price, name) {
    if(
       name != log_next_purchase.last_name ||
       time_to_buy > log_next_purchase.last_time_to_buy ||
-      time_to_buy < 10 ||
       Math.abs(time_to_buy - log_next_purchase.last_tick_time_to_buy) > 2 ||
-      time_to_buy / Math.pow(10, Math.floor(Math.log10(time_to_buy))) == Math.round(time_to_buy / Math.pow(10, Math.floor(Math.log10(time_to_buy)))) 
+      ( time_to_buy / Math.pow(10, Math.floor(Math.log10(time_to_buy))) == Math.round(time_to_buy / Math.pow(10, Math.floor(Math.log10(time_to_buy)))) && 
+         time_to_buy > 10 )
       )
    {
       log_next_purchase.last_time_to_buy = time_to_buy;
